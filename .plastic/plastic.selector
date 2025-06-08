@@ -1,0 +1,4 @@
+repository "ColorCember2@cankutun@cloud"
+  path "/"
+    br "/main"
+    co "/main"

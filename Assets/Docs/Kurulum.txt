@@ -1,0 +1,22 @@
+
+# Google Play In-App Update Sistemi Kurulumu (Immediate)
+
+1. Unity projenizi açın.
+2. Assets klasörüne bu zip dosyasını çıkarın (Scripts ve Docs klasörleri gelecek).
+3. Assets/Scripts klasöründeki UpdateChecker.cs scriptini bir GameObject'e bağlayın (örneğin: UpdateManager).
+4. Google Play Core plugin'ini aşağıdaki yöntemlerden biriyle projenize ekleyin:
+
+   a. Unity Package Manager ile:
+      - Packages/manifest.json dosyasına aşağıyı ekleyin:
+        "com.google.play.core": "1.8.5"
+
+   b. Manuel:
+      - https://developers.google.com/unity/ adresine gidin.
+      - Google Play Core .tgz paketini indirip Unity'de "Add package from tarball..." seçin.
+
+5. Android Build ayarlarınızda "Build App Bundle (Google Play)" kutusunu işaretleyin.
+6. versionCode ve versionName değerlerini artırarak yeni bir sürüm oluşturun.
+7. .aab dosyasını build edip Google Play Console'a yükleyin.
+8. Yayınlandıktan sonra kullanıcılar yeni sürümü uygulama içinde görecek.
+
+Bu sistem sadece Google Play Store üzerinden indirilen uygulamalarda çalışır.
