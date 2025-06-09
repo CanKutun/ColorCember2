@@ -7,53 +7,51 @@ using UnityEngine.UI;
 public class VersionChecker : MonoBehaviour
 {
     public string versionUrl = "https://raw.githubusercontent.com/CanKutun/ColorCember2/main/version.txt";
-
-    public GameObject updatePanel;  // Güncelleme paneli
-    public Button updateButton;     // Güncelleme butonu
-
-    private bool hasOpenedStore = false; // Çift açýlmayý önler
+    public GameObject updatePanel;
+    public Button updateButton;
 
     void Start()
     {
-        updatePanel.SetActive(false); // Baþlangýçta kapalý
+        Debug.Log("VersionChecker: Start() çalýþtý");
+        updatePanel.SetActive(false);
         StartCoroutine(CheckVersion());
     }
 
     IEnumerator CheckVersion()
     {
+        Debug.Log("VersionChecker: Versiyon kontrolü baþlatýldý.");
         UnityWebRequest www = UnityWebRequest.Get(versionUrl);
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError("Version check failed: " + www.error);
+            Debug.LogError("VersionChecker: Versiyon kontrol hatasý - " + www.error);
         }
         else
         {
             string latestVersion = www.downloadHandler.text.Trim();
-            Debug.Log("Latest version from server: " + latestVersion);
+            Debug.Log("VersionChecker: Sunucudan gelen versiyon = " + latestVersion);
 
             string currentVersion = Application.version;
-            Debug.Log("Current app version: " + currentVersion);
+            Debug.Log("VersionChecker: Uygulamadaki versiyon = " + currentVersion);
 
             if (currentVersion != latestVersion)
             {
-                Debug.Log("Update available!");
+                Debug.Log("VersionChecker: Güncelleme mevcut. Güncelleme paneli açýlýyor.");
                 updatePanel.SetActive(true);
-                updateButton.onClick.RemoveAllListeners(); // Eski listener'larý temizle
-                updateButton.onClick.AddListener(OpenStorePage); // Yeniden baðla
+                updateButton.onClick.RemoveAllListeners();
+                updateButton.onClick.AddListener(OpenStorePage);
             }
             else
             {
-                Debug.Log("App is up to date.");
+                Debug.Log("VersionChecker: Uygulama güncel.");
             }
         }
     }
 
     public void OpenStorePage()
     {
-        if (hasOpenedStore) return; // Daha önce açýldýysa tekrar açmaz
-        hasOpenedStore = true;
+        Debug.Log("VersionChecker: Play Store açýlýyor.");
         Application.OpenURL("https://play.google.com/store/apps/details?id=com.kutuns");
     }
 }
