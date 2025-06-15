@@ -18,5 +18,12 @@ public class Final : MonoBehaviour
         
     }
 
+    public void MenuDonus()
+    {
+        
+        SceneManager.LoadScene(0);
+
+    }
+
 
 }

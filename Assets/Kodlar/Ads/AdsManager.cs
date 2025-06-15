@@ -148,6 +148,36 @@ public class AdsManager : Singleton<AdsManager>
         });
     }
 
+    public void ShowLevelCompleteAds(Action onRewardedAdComplete, Action onNoAdFallback = null)
+    {
+        if (IsRewardedAdReady())
+        {
+            rewardEvent.RemoveAllListeners();
+            rewardEvent.AddListener(() =>
+            {
+                Debug.Log("Ödüllü reklam izlendi, devam ediliyor.");
+                onRewardedAdComplete?.Invoke();
+            });
+            ShowRewardedAd();
+        }
+        else if (IsInterstitialAdReady())
+        {
+            interstitialAdClosedEvent.RemoveAllListeners();
+            interstitialAdClosedEvent.AddListener(() =>
+            {
+                Debug.Log("Geçiş reklamı izlendi, devam ediliyor.");
+                onRewardedAdComplete?.Invoke();
+            });
+            ShowInterstitialAd();
+        }
+        else
+        {
+            Debug.LogWarning("Reklam yok, sahne yeniden yüklenecek.");
+            onNoAdFallback?.Invoke();
+        }
+    }
+
+
     private void RegisterRewardedAdEventHandlers(RewardedAd ad)
     {
         ad.OnAdPaid += (AdValue adValue) =>

@@ -25,7 +25,6 @@ public class TopKontrol : MonoBehaviour
     public AudioClip au, au1, au2;
 
     public float ziplamaGucu;
-
     public float invincibilityDuration = 2.0f;
     public float flashInterval = 0.1f;
     public bool SurekliOdulluReklamIzle = false;
@@ -64,6 +63,7 @@ public class TopKontrol : MonoBehaviour
             waitingForFirstTapAfterAd = false;
             isStopped = false;
             TopuDurumu(true);
+            StartCoroutine(ActivateInvincibility());
             top.velocity = Vector2.up * ziplamaGucu;
         }
         else if (!isStopped && !waitingForFirstTapAfterAd && Time.timeScale > 0 && Input.GetMouseButton(0))
@@ -74,21 +74,39 @@ public class TopKontrol : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D temas)
     {
+        if (temas.CompareTag("RenkDegistirici"))
+        {
+            RastgeleRenk();
+            AudioSource.PlayClipAtPoint(au, transform.position);
+            Destroy(temas.gameObject);
+            return;
+        }
+
+        if (temas.CompareTag("Puan"))
+        {
+            int artis = Random.Range(1, 11); // 1 ile 10 arasında rastgele
+            skor += artis;
+            skorYazisi.text = skor.ToString();
+
+            if (skor > yuksekSkor)
+            {
+                yuksekSkor = skor;
+                PlayerPrefs.SetInt("yuksekSkor", yuksekSkor);
+                yuksekSkorYazisi.text = yuksekSkor.ToString();
+            }
+
+            AudioSource.PlayClipAtPoint(au1, transform.position);
+            Destroy(temas.gameObject);
+            return;
+        }
+
         if (temas.CompareTag("Yan"))
         {
-            if (AdsManager.Instance.OlunceReklamGoster)
+            if (AdsManager.Instance.OlunceReklamGoster && AdsManager.Instance.IsInterstitialAdReady())
             {
-                if (AdsManager.Instance.IsInterstitialAdReady())
-                {
-                    var adsM = AdsManager.Instance;
-                    adsM.interstitialAdClosedEvent.RemoveAllListeners();
-                    adsM.interstitialAdClosedEvent.AddListener(() => SceneManager.LoadScene(0));
-                    adsM.ShowInterstitialAd();
-                }
-                else
-                {
-                    SceneManager.LoadScene(0);
-                }
+                AdsManager.Instance.interstitialAdClosedEvent.RemoveAllListeners();
+                AdsManager.Instance.interstitialAdClosedEvent.AddListener(() => SceneManager.LoadScene(0));
+                AdsManager.Instance.ShowInterstitialAd();
             }
             else
             {
@@ -103,11 +121,9 @@ public class TopKontrol : MonoBehaviour
             TopuDurumu(false);
             isStopped = true;
 
-            // **Burada skor sıfırlanmıyor, oyuncu kaldığı skorla devam edecek**
-            // PlayerPrefs.DeleteKey("skor");  <-- BU SATIRI KALDIRDIK!
+            Debug.Log("Kenar ile çarpışıldı ve renk yanlış.");
 
             var adsM = AdsManager.Instance;
-            Debug.Log("Kenar ile çarpışıldı ve renk yanlış.");
 
             if (adsM.IsRewardedAdReady() && (!rewardedAdUsedThisSession || SurekliOdulluReklamIzle))
             {
@@ -115,12 +131,13 @@ public class TopKontrol : MonoBehaviour
                 adsM.rewardEvent.RemoveAllListeners();
                 adsM.rewardEvent.AddListener(() =>
                 {
-                    Debug.Log("Ödül alındı, dokunulmazlık başlıyor.");
+                    Debug.Log("Ödül alındı, dokunulmazlık başlatılacak (dokunma bekleniyor).");
                     rewardedAdUsedThisSession = true;
 
                     AdsFailPanel.Instance.HidePanel();
 
-                    StartCoroutine(ActivateInvincibility());
+                    // Dokunma bekleniyor
+                    waitingForFirstTapAfterAd = true;
                 });
             }
             else if (adsM.IsInterstitialAdReady())
@@ -136,29 +153,6 @@ public class TopKontrol : MonoBehaviour
             {
                 SceneManager.LoadScene(0);
             }
-        }
-
-        if (temas.CompareTag("RenkDegistirici"))
-        {
-            RastgeleRenk();
-            AudioSource.PlayClipAtPoint(au1, transform.position);
-            Destroy(temas.gameObject);
-        }
-
-        if (temas.CompareTag("Yildiz"))
-        {
-            skor += Random.Range(5, 11);
-            skorYazisi.text = skor.ToString();
-            AudioSource.PlayClipAtPoint(au, transform.position);
-            Destroy(temas.gameObject);
-
-            if (skor > yuksekSkor)
-            {
-                yuksekSkor = skor;
-                yuksekSkorYazisi.text = yuksekSkor.ToString();
-                PlayerPrefs.SetInt("yuksekSkor", yuksekSkor);
-            }
-            PlayerPrefs.SetInt("skor", skor); // Her puan artışında kaydet
         }
 
         if (temas.CompareTag("Bayrak"))
@@ -177,49 +171,52 @@ public class TopKontrol : MonoBehaviour
                 adsM.rewardEvent.RemoveAllListeners();
                 adsM.rewardEvent.AddListener(() =>
                 {
-                    Debug.Log("Ödül alındı, sonraki bölüme geçiliyor...");
                     rewardedAdUsedThisSession = true;
 
-                    // ❗️Kayıt sadece reklamdan sonra yapılır:
                     PlayerPrefs.SetInt("SavedLevel", sonrakiBolum);
                     PlayerPrefs.SetInt("acilanLevel", sonrakiBolum);
                     PlayerPrefs.Save();
-                    Debug.Log("Kayıt Edilen Level: " + sonrakiBolum);
 
                     if (AdsFailPanel.Instance != null)
                         AdsFailPanel.Instance.HidePanel();
 
                     if (sonrakiBolum < SceneManager.sceneCountInBuildSettings)
-                    {
                         SceneManager.LoadScene(sonrakiBolum);
-                    }
                     else
-                    {
-                        Debug.Log("Son sahneye ulaşıldı. Ana menüye dönülüyor...");
                         SceneManager.LoadScene("MainMenu");
-                    }
                 });
-
                 adsM.ShowRewardedAd();
+            }
+            else if (adsM.IsInterstitialAdReady())
+            {
+                adsM.interstitialAdClosedEvent.RemoveAllListeners();
+                adsM.interstitialAdClosedEvent.AddListener(() =>
+                {
+                    rewardedAdUsedThisSession = true;
+
+                    PlayerPrefs.SetInt("SavedLevel", sonrakiBolum);
+                    PlayerPrefs.SetInt("acilanLevel", sonrakiBolum);
+                    PlayerPrefs.Save();
+
+                    if (AdsFailPanel.Instance != null)
+                        AdsFailPanel.Instance.HidePanel();
+
+                    if (sonrakiBolum < SceneManager.sceneCountInBuildSettings)
+                        SceneManager.LoadScene(sonrakiBolum);
+                    else
+                        SceneManager.LoadScene("MainMenu");
+                });
+                adsM.ShowInterstitialAd();
             }
             else
             {
-                Debug.LogWarning("Ödüllü reklam hazır değil, geçiş engellendi.");
-
-                if (AdsFailPanel.Instance != null)
-                {
-                    AdsFailPanel.Instance.ShowFaildPanel();
-                }
-
-                // Reklam yoksa kayıt yapılmaz, bölüm geçilmez.
+                SceneManager.LoadScene(mevcutBolum);
             }
         }
+    }
 
-
-
-        IEnumerator ActivateInvincibility()
+    private IEnumerator ActivateInvincibility()
     {
-        waitingForFirstTapAfterAd = true;
         isNewBron = true;
 
         if (flashingCoroutine != null)
@@ -236,7 +233,7 @@ public class TopKontrol : MonoBehaviour
         isNewBron = false;
     }
 
-    IEnumerator FlashEffect()
+    private IEnumerator FlashEffect()
     {
         Color flashColor = new Color(originalTopColor.r, originalTopColor.g, originalTopColor.b, 0.3f);
         while (true)
@@ -247,7 +244,6 @@ public class TopKontrol : MonoBehaviour
             yield return new WaitForSeconds(flashInterval);
         }
     }
-  }
 
     private void RastgeleRenk()
     {
