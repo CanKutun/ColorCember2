@@ -20,7 +20,7 @@ MonoBehaviour:
   DisableFocusTimeCollection: 0
   RequestTimeout: 2000
   RequestKeepAlive: 1
-  CompressResponses: 0
+  CompressResponses: 1
   DecompressWithDownloadHandler: 1
   LogLevel: 12
   LoggerHost: 
