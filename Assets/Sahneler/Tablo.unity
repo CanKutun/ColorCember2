@@ -695,7 +695,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxResultsCount: 20
-  statisticName: Skor
+  statisticName: HighScore
   leaderboardEntryPrefab: {fileID: 8247833871988839645, guid: c1f70f382f1ba994a92c30d1ec21b836, type: 3}
   leaderboardContent: {fileID: 938481138}
   nextPageButton: {fileID: 899017516}
@@ -798,8 +798,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1986837367}
   m_HandleRect: {fileID: 1986837366}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.9999976
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1086,7 +1086,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.29629013}
   m_AnchorMax: {x: 1, y: 0.92}
-  m_AnchoredPosition: {x: 0.0009765625, y: 152.23996}
+  m_AnchoredPosition: {x: 0.0009765625, y: 152.2396}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &938481139

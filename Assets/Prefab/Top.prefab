@@ -171,6 +171,7 @@ MonoBehaviour:
   au: {fileID: 8300000, guid: 7cf7135c9fd52fb498129a09f51d439c, type: 3}
   au1: {fileID: 8300000, guid: bbfcb8658167ab24783fbcf6b7f316b2, type: 3}
   au2: {fileID: 8300000, guid: d5a5c83e05181ff4e99770a301191fda, type: 3}
+  au3: {fileID: 8300000, guid: 85c7152d28f98124da04492f8a53a667, type: 3}
   ziplamaGucu: 4
   invincibilityDuration: 3
   flashInterval: 0.1

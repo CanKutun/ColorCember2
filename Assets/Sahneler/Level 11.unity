@@ -244,14 +244,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 142864898788013076, guid: 2a828333197367b47b169867d402110c, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -0.0002593994
-      objectReference: {fileID: 0}
-    - target: {fileID: 142864898788013076, guid: 2a828333197367b47b169867d402110c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2484411022780907023, guid: 2a828333197367b47b169867d402110c, type: 3}
       propertyPath: m_Camera
       value: 
@@ -259,14 +251,6 @@ PrefabInstance:
     - target: {fileID: 2494242274016724894, guid: 2a828333197367b47b169867d402110c, type: 3}
       propertyPath: m_Name
       value: Canvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 4183485685583632657, guid: 2a828333197367b47b169867d402110c, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4673991790487436658, guid: 2a828333197367b47b169867d402110c, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6071239009748521886, guid: 2a828333197367b47b169867d402110c, type: 3}
       propertyPath: m_Pivot.x

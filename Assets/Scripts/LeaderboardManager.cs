@@ -10,10 +10,10 @@ public class LeaderboardManager : MonoBehaviour
 {
     [Header("Leaderboard Settings")]
     public int maxResultsCount = 10;
-    public string statisticName = "Skor";
+    public string statisticName = "HighScore";
 
     [Header("UI References")]
-    public GameObject leaderboardEntryPrefab; // Prefab içinde 4 TextMeshProUGUI bileşeni olmalı
+    public GameObject leaderboardEntryPrefab; // Prefab’ın içinde LeaderboardEntry scripti olmalı
     public Transform leaderboardContent;
     public Button nextPageButton;
     public Button prevPageButton;
@@ -21,6 +21,20 @@ public class LeaderboardManager : MonoBehaviour
 
     private int currentPage = 0;
     private Dictionary<string, GameObject> entryObjects = new Dictionary<string, GameObject>();
+    public static LeaderboardManager Instance { get; private set; }
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -34,26 +48,17 @@ public class LeaderboardManager : MonoBehaviour
         StartCoroutine(LoadLeaderboardRoutine());
     }
 
-    /// <summary>
-    /// Dışarıdan çağrıldığında liderlik tablosunu yeniler.
-    /// </summary>
     public void RefreshLeaderboard()
     {
         StartCoroutine(LoadLeaderboardRoutine());
     }
 
-    /// <summary>
-    /// Liderlik tablosunu yükleyen coroutine.
-    /// </summary>
     private IEnumerator LoadLeaderboardRoutine()
     {
         yield return StartCoroutine(GetLeaderboard());
         yield return StartCoroutine(RequestUserDataForEntries());
     }
 
-    /// <summary>
-    /// PlayFab'den liderlik tablosu verilerini alır.
-    /// </summary>
     public IEnumerator GetLeaderboard()
     {
         bool done = false;
@@ -84,16 +89,11 @@ public class LeaderboardManager : MonoBehaviour
                     rt.anchoredPosition = Vector2.zero;
                 }
 
-                var texts = entryObj.GetComponentsInChildren<TextMeshProUGUI>();
-                if (texts.Length >= 3)
+                var entryScript = entryObj.GetComponent<LeaderboardEntry>();
+                if (entryScript != null)
                 {
-                    texts[0].text = (item.Position + 1).ToString(); // Sıra
-                    texts[1].text = item.DisplayName ?? item.PlayFabId; // İsim
-                    texts[2].text = item.StatValue.ToString(); // Skor
+                    entryScript.SetEntry(item.Position + 1, item.DisplayName ?? item.PlayFabId, item.StatValue, "");
                 }
-
-                if (texts.Length >= 4)
-                    texts[3].text = "…"; // Bayrak yükleniyor sembolü
 
                 entryObjects[item.PlayFabId] = entryObj;
             }
@@ -112,9 +112,6 @@ public class LeaderboardManager : MonoBehaviour
             yield return null;
     }
 
-    /// <summary>
-    /// Her giriş için kullanıcı verilerinden ülke bilgisini alır.
-    /// </summary>
     private IEnumerator RequestUserDataForEntries()
     {
         foreach (var kvp in entryObjects)
@@ -139,14 +136,10 @@ public class LeaderboardManager : MonoBehaviour
                     countryCode = GetCountryCode(countryName);
                 }
 
-                var image = entryObj.GetComponentInChildren<Image>();
-                if (image != null && !string.IsNullOrEmpty(countryCode))
+                var entryScript = entryObj.GetComponent<LeaderboardEntry>();
+                if (entryScript != null)
                 {
-                    Sprite flagSprite = Resources.Load<Sprite>($"Flags/PNG/{countryCode}");
-                    if (flagSprite != null)
-                        image.sprite = flagSprite;
-                    else
-                        Debug.LogWarning($"Bayrak resmi bulunamadı: {countryCode}");
+                    entryScript.SetFlag(countryCode);
                 }
 
                 done = true;
@@ -172,18 +165,12 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Liderlik tablosundaki girişleri temizler.
-    /// </summary>
     private void ClearLeaderboard()
     {
         foreach (Transform child in leaderboardContent)
             Destroy(child.gameObject);
     }
 
-    /// <summary>
-    /// Sonraki sayfaya geçer.
-    /// </summary>
     private void OnNextPage()
     {
         currentPage++;
@@ -191,9 +178,6 @@ public class LeaderboardManager : MonoBehaviour
         StartCoroutine(LoadLeaderboardRoutine());
     }
 
-    /// <summary>
-    /// Önceki sayfaya döner.
-    /// </summary>
     private void OnPrevPage()
     {
         if (currentPage > 0)
@@ -204,23 +188,17 @@ public class LeaderboardManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Sayfa numarasını günceller.
-    /// </summary>
     private void UpdatePageNumberText()
     {
         if (pageNumberText != null)
             pageNumberText.text = $"PAGE {currentPage + 1}";
     }
 
-    /// <summary>
-    /// Ülke adını ISO ülke koduna çevirir.
-    /// </summary>
-    private string GetCountryCode(string countryName)
+    string GetCountryCode(string countryName)
     {
         var map = new Dictionary<string, string>()
-        {
-            {"afghanistan", "af"}, {"albania", "al"}, {"algeria", "dz"}, {"andorra", "ad"}, {"angola", "ao"},
+    {
+        {"afghanistan", "af"}, {"albania", "al"}, {"algeria", "dz"}, {"andorra", "ad"}, {"angola", "ao"},
         {"argentina", "ar"}, {"armenia", "am"}, {"australia", "au"}, {"austria", "at"}, {"azerbaijan", "az"},
         {"bahamas", "bs"}, {"bahrain", "bh"}, {"bangladesh", "bd"}, {"belarus", "by"}, {"belgium", "be"},
         {"belize", "bz"}, {"benin", "bj"}, {"bhutan", "bt"}, {"bolivia", "bo"}, {"bosnia and herzegovina", "ba"},
@@ -259,27 +237,8 @@ public class LeaderboardManager : MonoBehaviour
         {"vietnam", "vn"}, {"yemen", "ye"}, {"zambia", "zm"}, {"zimbabwe", "zw"}
     };
 
-        if (map.TryGetValue(countryName.ToLower(), out string code))
+        if (map.TryGetValue(countryName, out string code))
             return code;
-        else
-            return "";
-    }
-
-    /// <summary>
-    /// ISO ülke kodunu emoji bayrağa çevirir.
-    /// </summary>
-    private string CountryCodeToEmoji(string countryCode)
-    {
-        if (string.IsNullOrEmpty(countryCode) || countryCode.Length != 2)
-            return "";
-
-        countryCode = countryCode.ToUpper();
-
-        int baseCode = 0x1F1E6;
-
-        char firstChar = (char)(baseCode + (countryCode[0] - 'A'));
-        char secondChar = (char)(baseCode + (countryCode[1] - 'A'));
-
-        return new string(new char[] { firstChar, secondChar });
+        return "";
     }
 }

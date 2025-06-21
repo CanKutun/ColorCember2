@@ -25,5 +25,25 @@ public class Final : MonoBehaviour
 
     }
 
+    public void Pause()
+    {
+        
+        Time.timeScale = 0f;
+
+    }
+
+    public void Devam()
+    {
+
+        Time.timeScale = 1f;
+
+    }
+
+    public void Menu()
+    {
+
+        SceneManager.LoadScene(0);
+
+    }
 
 }

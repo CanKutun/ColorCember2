@@ -22,7 +22,7 @@ public class TopKontrol : MonoBehaviour
     private int yuksekSkor = 0;
     public TMP_Text yuksekSkorYazisi;
 
-    public AudioClip au, au1, au2;
+    public AudioClip au, au1, au2, au3;
 
     public float ziplamaGucu;
     public float invincibilityDuration = 2.0f;
@@ -36,6 +36,10 @@ public class TopKontrol : MonoBehaviour
     private Coroutine flashingCoroutine = null;
     private Color originalTopColor;
 
+    private int lastSentHighScore = 0;
+    private float timeSinceLastSend = 0f;
+    private float sendInterval = 10f; // 10 saniye
+
     void Start()
     {
         rewardedAdUsedThisSession = false;
@@ -45,6 +49,8 @@ public class TopKontrol : MonoBehaviour
         RastgeleRenk();
         TopuDurumu(true);
         PrepareGame();
+
+        lastSentHighScore = PlayerPrefs.GetInt("yuksekSkor", 0);
     }
 
     private void PrepareGame()
@@ -70,7 +76,32 @@ public class TopKontrol : MonoBehaviour
         {
             top.velocity = Vector2.up * ziplamaGucu;
         }
+
+        // Skoru 10 saniyede bir kontrol edip PlayFab'a gönder
+        timeSinceLastSend += Time.deltaTime;
+        if (timeSinceLastSend >= sendInterval)
+        {
+            timeSinceLastSend = 0f;
+
+            if (skor > lastSentHighScore)
+            {
+                lastSentHighScore = skor;
+
+                // Yerel yüksek skoru da güncelle
+                yuksekSkor = skor;
+                PlayerPrefs.SetInt("yuksekSkor", yuksekSkor);
+                yuksekSkorYazisi.text = yuksekSkor.ToString();
+
+                if (PlayFabScoreManager.Instance != null)
+                {
+                    PlayFabScoreManager.Instance.SendHighScore(yuksekSkor);
+                    Debug.Log("Yeni yüksek skor PlayFab'a gönderildi: " + yuksekSkor);
+                }
+            }
+        }
     }
+
+
 
     private void OnTriggerEnter2D(Collider2D temas)
     {
@@ -84,7 +115,7 @@ public class TopKontrol : MonoBehaviour
 
         if (temas.CompareTag("Puan"))
         {
-            int artis = Random.Range(1, 11); // 1 ile 10 arasında rastgele
+            int artis = Random.Range(1, 11);
             skor += artis;
             skorYazisi.text = skor.ToString();
 
@@ -93,6 +124,12 @@ public class TopKontrol : MonoBehaviour
                 yuksekSkor = skor;
                 PlayerPrefs.SetInt("yuksekSkor", yuksekSkor);
                 yuksekSkorYazisi.text = yuksekSkor.ToString();
+
+                // İşte buraya ekle
+                if (PlayFabScoreManager.Instance != null)
+                {
+                    PlayFabScoreManager.Instance.SendHighScore(yuksekSkor);
+                }
             }
 
             AudioSource.PlayClipAtPoint(au1, transform.position);
