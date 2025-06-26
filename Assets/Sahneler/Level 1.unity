@@ -321,10 +321,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1334265781993380519, guid: 2a828333197367b47b169867d402110c, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 10.182007
-      objectReference: {fileID: 0}
     - target: {fileID: 2484411022780907023, guid: 2a828333197367b47b169867d402110c, type: 3}
       propertyPath: m_Camera
       value: 
@@ -604,10 +600,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 519420031}
-    - target: {fileID: 1329899164100804978, guid: 4dd9de2046440724391421d85eda5c16, type: 3}
-      propertyPath: m_SortingOrder
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 1334818954399691641, guid: 4dd9de2046440724391421d85eda5c16, type: 3}
       propertyPath: m_Name
       value: Level Gecis
