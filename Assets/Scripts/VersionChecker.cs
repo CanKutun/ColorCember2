@@ -7,67 +7,55 @@ using UnityEngine.UI;
 
 public class VersionChecker : MonoBehaviour
 {
+    [Header("Version")]
     public string versionUrl = "https://raw.githubusercontent.com/CanKutun/ColorCember2/main/version.txt";
-
-    // Güncelleme paneli ve butonu (Unity'de inspector'dan atayýn)
     public GameObject updatePanel;
-    public Button updateButton;
 
     void Start()
     {
-        Debug.Log("VersionChecker: Start() çalýþtý");
-        updatePanel.SetActive(false);  // Baþlangýçta panel kapalý olsun
         StartCoroutine(CheckVersion());
     }
 
     IEnumerator CheckVersion()
     {
-        Debug.Log("VersionChecker: Versiyon kontrolü baþlatýldý.");
         UnityWebRequest www = UnityWebRequest.Get(versionUrl);
+
         yield return www.SendWebRequest();
 
         if (www.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError("VersionChecker: Versiyon kontrol hatasý - " + www.error);
+            Debug.LogError(">>> [VersionChecker] version.txt alýnamadý: " + www.error);
         }
         else
         {
-            string latestVersion = www.downloadHandler.text.Trim();
-            Debug.Log("VersionChecker: Sunucudan gelen versiyon = '" + latestVersion + "'");
+            string latestVersionRaw = www.downloadHandler.text.Replace("\n", "").Replace("\r", "").Trim();
+            string currentVersionRaw = Application.version.Trim();
 
-            string currentVersion = Application.version;
-            Debug.Log("VersionChecker: Uygulamadaki versiyon = '" + currentVersion + "'");
+            Debug.Log(">>> [VersionChecker] Uygulama Sürümü: " + currentVersionRaw);
+            Debug.Log(">>> [VersionChecker] En Son Sürüm: " + latestVersionRaw);
 
             try
             {
-                // Versiyonlarý System.Version olarak parse et, karþýlaþtýr
-                Version currentVer = new Version(currentVersion);
-                Version latestVer = new Version(latestVersion);
+                Version latestVersion = new Version(latestVersionRaw);
+                Version currentVersion = new Version(currentVersionRaw);
 
-                if (currentVer.CompareTo(latestVer) < 0)
+                if (currentVersion < latestVersion)
                 {
-                    Debug.Log("VersionChecker: Güncelleme mevcut. Güncelleme paneli açýlýyor.");
-                    updatePanel.SetActive(true);
-
-                    // Önceki listener'larý temizle, sonra butona yeni listener ekle
-                    updateButton.onClick.RemoveAllListeners();
-                    updateButton.onClick.AddListener(OpenStorePage);
+                    Debug.Log(">>> [VersionChecker] Güncelleme gerekli.");
+                    if (updatePanel != null)
+                        updatePanel.SetActive(true);
+                    else
+                        Debug.LogWarning(">>> [VersionChecker] updatePanel atanmamýþ.");
                 }
                 else
                 {
-                    Debug.Log("VersionChecker: Uygulama güncel.");
+                    Debug.Log(">>> [VersionChecker] Güncel sürüm kullanýlýyor.");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.LogError("VersionChecker: Versiyon karþýlaþtýrma hatasý - " + e.Message);
+                Debug.LogError(">>> [VersionChecker] Sürüm karþýlaþtýrmasýnda hata: " + ex.Message);
             }
         }
-    }
-
-    public void OpenStorePage()
-    {
-        Debug.Log("VersionChecker: Play Store açýlýyor.");
-        Application.OpenURL("https://play.google.com/store/apps/details?id=com.kutuns");
     }
 }
