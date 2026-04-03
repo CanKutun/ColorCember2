@@ -1,0 +1,36 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.kutuns.colorcember2">
+
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="merge" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.NoTitleBar"
+        tools:replace="android:icon">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3601362388931534~2798353450" />
+
+        <activity android:name="com.unity3d.player.UnityPlayerActivity"
+                  android:theme="@android:style/Theme.NoTitleBar"
+                  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+                  android:exported="true"
+                  android:hardwareAccelerated="false"
+                  android:launchMode="singleTask"
+                  android:resizeableActivity="true">
+                  
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true"/>
+            <meta-data android:name="notch_support" android:value="true"/>
+        </activity>
+    </application>
+</manifest>

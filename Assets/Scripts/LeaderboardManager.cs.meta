@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 88fd8a76c118693449754c242c3f3228
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - leaderboardEntryPrefab: {fileID: 8247833871988839645, guid: c1f70f382f1ba994a92c30d1ec21b836, type: 3}
+  - leaderboardContent: {instanceID: 0}
+  - nextPageButton: {instanceID: 0}
+  - prevPageButton: {instanceID: 0}
+  - pageNumberText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
